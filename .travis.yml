@@ -7,5 +7,4 @@ addons:
     organization: lisa9601
     token: 11048304bf803eb2929f509311869aac78c2528c
 script:
-  - bin/bookkeeper localbookie 6
   - mvn clean verify sonar:sonar
