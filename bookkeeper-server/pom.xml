@@ -17,6 +17,14 @@
   </properties>
 
   <dependencies>
+
+    <dependency>
+      <groupId>org.pitest</groupId>
+      <artifactId>pitest</artifactId>
+      <version>1.5.1</version>
+      <type>maven-plugin</type>
+    </dependency>
+
     <dependency>
       <groupId>org.apache.bookkeeper</groupId>
       <artifactId>bookkeeper-common</artifactId>
@@ -167,143 +175,5 @@
       <artifactId>guava</artifactId>
     </dependency>
   </dependencies>
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jar-plugin</artifactId>
-        <version>${maven-jar-plugin.version}</version>
-        <executions>
-          <execution>
-            <goals>
-              <goal>test-jar</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.rat</groupId>
-        <artifactId>apache-rat-plugin</artifactId>
-        <configuration>
-          <excludes>
-            <!-- exclude generated file //-->
-            <exclude>**/target/**/*</exclude>
-            <exclude>**/.classpath</exclude>
-            <exclude>**/.gitignore</exclude>
-            <exclude>**/.project</exclude>
-            <exclude>**/.checkstyle</exclude>
-            <exclude>**/.settings/*</exclude>
-            <exclude>src/test/resources/server-key.pem</exclude>
-            <exclude>src/test/resources/server-key.p12</exclude>
-            <exclude>src/test/resources/server-key.jks</exclude>
-            <exclude>src/test/resources/server-cert.pem</exclude>
-            <exclude>src/test/resources/client-key.pem</exclude>
-            <exclude>src/test/resources/client-key.p12</exclude>
-            <exclude>src/test/resources/client-key.jks</exclude>
-            <exclude>src/test/resources/client-cert.pem</exclude>
-            <exclude>src/test/resources/keyStoreClientPassword.txt</exclude>
-            <exclude>src/test/resources/keyStoreServerPassword.txt</exclude>
-          </excludes>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>com.github.spotbugs</groupId>
-        <artifactId>spotbugs-maven-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <version>${maven-surefire-plugin.version}</version>
-        <configuration>
-          <properties>
-            <property>
-              <name>listener</name>
-              <value>org.apache.bookkeeper.common.testing.util.TimedOutTestsListener</value>
-            </property>
-          </properties>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-javadoc-plugin</artifactId>
-        <version>${maven-javadoc-plugin.version}</version>
-        <configuration>
-          <!-- Avoid for missing javadoc comments to be marked as errors -->
-          <additionalparam>-Xdoclint:none</additionalparam>
-          <subpackages>org.apache.bookkeeper.client:org.apache.bookkeeper.conf:org.apache.bookkeeper.feature</subpackages>
-          <groups>
-            <group>
-              <title>Bookkeeper</title>
-              <packages>org.apache.bookkeeper*</packages>
-            </group>
-          </groups>
-        </configuration>
-        <executions>
-          <execution>
-            <id>attach-javadocs</id>
-            <goals>
-              <goal>jar</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
-  <profiles>
-    <profile>
-      <id>vertx-http-server</id>
-      <dependencies>
-        <dependency>
-          <groupId>org.apache.bookkeeper.http</groupId>
-          <artifactId>vertx-http-server</artifactId>
-          <version>${project.parent.version}</version>
-        </dependency>
-      </dependencies>
-    </profile>
-    <profile>
-      <id>tls-certs</id>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>exec-maven-plugin</artifactId>
-            <version>1.6.0</version>
-            <executions>
-              <execution>
-                <id>Generate Self-Signed Certificates</id>
-                <phase>generate-test-resources</phase>
-                <goals>
-                  <goal>exec</goal>
-                </goals>
-                <configuration>
-                  <workingDirectory>${basedir}/src/test/resources</workingDirectory>
-                  <executable>${basedir}/src/test/resources/generateKeysAndCerts.sh</executable>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-    <!-- test profiles -->
-    <profile>
-      <id>skipBookKeeperServerTests</id>
-      <activation>
-        <property>
-          <name>skipBookKeeperServerTests</name>
-        </property>
-      </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <configuration>
-              <skipTests>true</skipTests>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-  </profiles>
+
 </project>
