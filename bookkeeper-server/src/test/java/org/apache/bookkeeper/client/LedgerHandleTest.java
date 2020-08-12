@@ -1,6 +1,6 @@
 package org.apache.bookkeeper.client;
 
-import junit.framework.TestCase;
+import org.apache.bookkeeper.test.BookKeeperClusterTestCase;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -8,18 +8,23 @@ import java.util.Enumeration;
 
 import static org.junit.Assert.*;
 
-public class LedgerHandleTest {
+public class LedgerHandleTest extends BookKeeperClusterTestCase {
 
     LedgerHandle ledger = null;
     long entry1, entry2, entry3;
 
+    public LedgerHandleTest() {
+        super(3);
+    }
+
+    @Override
     @Before
     public void setUp() throws Exception {
 
-        String connectionString = "127.0.0.1:2181";
-        BookKeeper bkClient = new BookKeeper(connectionString);
+        super.setUp();
+
         byte[] password = "password".getBytes();
-        this.ledger = bkClient.createLedger(BookKeeper.DigestType.MAC, password);
+        this.ledger = bkc.createLedger(1,1,BookKeeper.DigestType.MAC, password);
 
         entry1 = ledger.addEntry("hello".getBytes());
         entry2 = ledger.addEntry("world".getBytes());

@@ -20,4 +20,4 @@
 /**
  * Common rpc classes used for testing.
  */
-package org.apache.bookkeeper.tests.rpc;
+package org.apache.bookkeeper.test.rpc;
