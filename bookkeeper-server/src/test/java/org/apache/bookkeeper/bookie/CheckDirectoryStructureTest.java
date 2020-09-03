@@ -16,7 +16,6 @@ public class CheckDirectoryStructureTest {
     @BeforeClass
     public static void setUp() throws Exception {
 
-        //Creazione delle directory
         dir1 = new File("src/test/prova");
         dir2 = new File("src/test/prova2");
         dir3 = new File("src/test/prova3");
@@ -31,7 +30,6 @@ public class CheckDirectoryStructureTest {
     @AfterClass
     public static void tearDown() throws Exception {
 
-        //Cancellazione delle directory
         if(!dir1.delete() || !dir2.delete() || !dir3.delete()){
             throw new IOException("Failed to delete directory");
         }
@@ -81,6 +79,7 @@ public class CheckDirectoryStructureTest {
         verFile.delete();
     }
 
+
     //Esistono vecchi dati nella directory
     @Test
     public void test3() throws IOException {
@@ -118,7 +117,7 @@ public class CheckDirectoryStructureTest {
     }
 
 
-    //Non riesce a creare le directory
+    //Impossibile creare le directory
     @Test
     public void test4() {
 

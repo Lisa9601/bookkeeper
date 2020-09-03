@@ -11,7 +11,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-import org.mockito.internal.matchers.Null;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -20,9 +19,9 @@ import java.util.Collection;
 @RunWith(Parameterized.class)
 public class AddEntryTest extends BookKeeperClusterTestCase {
 
-    private LedgerHandle ledger = null;
-    private long entryId = 20;
-    private String string = "text for tests";
+    private long ledgerId;
+    private final long entryId = 20;
+    private static final String string = "text for tests";
 
     private static final byte[] masterKey = "password".getBytes();
     private static final BookkeeperInternalCallbacks.WriteCallback wc = (rc, ledgerId, entryId, addr, ctx) -> { };
@@ -32,26 +31,29 @@ public class AddEntryTest extends BookKeeperClusterTestCase {
     private BookkeeperInternalCallbacks.WriteCallback writeCallback;
     private Object ctx;
     private byte[] key;
+    private boolean valid;
     private boolean expected;
 
     @Parameterized.Parameters
     public static Collection params() {
 
         return Arrays.asList(new Object[][] {
-                { Unpooled.buffer(), false, wc, null, masterKey, true },
-                { null, false, wc, null, masterKey, false }
+                { Unpooled.buffer(), false, wc, null, masterKey, true, true },
+                { Unpooled.buffer(), true, wc, null, null, false, false },
+                { null, false, null, null, masterKey, false, false }
         });
     }
 
 
     public AddEntryTest(ByteBuf entry, boolean ack, BookkeeperInternalCallbacks.WriteCallback writeCallback,
-                        Object ctx, byte[] key, boolean expected) {
+                        Object ctx, byte[] key, boolean valid, boolean expected) {
         super(3);
         this.entry = entry;
         this.ack = ack;
         this.writeCallback = writeCallback;
         this.ctx = ctx;
         this.key = key;
+        this.valid = valid;
         this.expected = expected;
     }
 
@@ -60,13 +62,13 @@ public class AddEntryTest extends BookKeeperClusterTestCase {
     @Before
     public void setUp() throws Exception {
         super.setUp();
-        ledger = bkc.createLedger(BookKeeper.DigestType.CRC32,masterKey);
+        LedgerHandle ledger = bkc.createLedger(BookKeeper.DigestType.CRC32, masterKey);
+        ledgerId = ledger.getId();
 
-        if(entry != null){
-            entry.writeLong(ledger.getId());
+        if(valid){
+            entry.writeLong(ledgerId);
             entry.writeLong(entryId);
             entry.writeBytes(string.getBytes());
-
         }
 
     }
@@ -86,23 +88,24 @@ public class AddEntryTest extends BookKeeperClusterTestCase {
             result = false;
         }
 
-        try {
-            ByteBuf entryRead = bookie.readEntry(ledger.getId(),entryId);
+        if(valid){
 
-            byte[] destination = new byte[entryRead.readableBytes()];
-            entryRead.getBytes(0,destination);
-            String content = new String(destination);
-            content = content.substring(content.length() - string.length());
+            try {
+                ByteBuf entryRead = bookie.readEntry(ledgerId,entryId);
 
-            Assert.assertEquals(string,content);
+                byte[] destination = new byte[entryRead.readableBytes()];
+                entryRead.getBytes(0,destination);
+                String content = new String(destination);
+                content = content.substring(content.length() - string.length());
 
-        } catch (IOException e) {
-            e.printStackTrace();
-            result = false;
+                Assert.assertEquals(string,content);
+
+            } catch (IOException e) {
+                e.printStackTrace();
+                result = false;
+            }
+
         }
-
-
-
 
         Assert.assertEquals(expected,result);
 

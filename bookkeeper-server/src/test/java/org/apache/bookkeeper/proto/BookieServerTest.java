@@ -1,7 +1,6 @@
 package org.apache.bookkeeper.proto;
 
 
-
 import org.apache.bookkeeper.bookie.Bookie;
 import org.apache.bookkeeper.bookie.BookieException;
 import org.apache.bookkeeper.conf.ServerConfiguration;

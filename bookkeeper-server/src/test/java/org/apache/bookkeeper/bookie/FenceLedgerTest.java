@@ -1,8 +1,11 @@
 package org.apache.bookkeeper.bookie;
 
-import org.apache.bookkeeper.client.BKException;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import org.apache.bookkeeper.client.BookKeeper;
 import org.apache.bookkeeper.client.LedgerHandle;
+import org.apache.bookkeeper.net.BookieSocketAddress;
+import org.apache.bookkeeper.proto.BookkeeperInternalCallbacks;
 import org.apache.bookkeeper.test.BookKeeperClusterTestCase;
 import org.junit.Assert;
 import org.junit.Before;
@@ -38,6 +41,7 @@ public class FenceLedgerTest extends BookKeeperClusterTestCase {
         return Arrays.asList(new Object[][] {
                 { -1, null, 1 },
                 { 0, masterKey, 2 },
+                { 0, null, 1 }
         });
     }
 
@@ -57,7 +61,7 @@ public class FenceLedgerTest extends BookKeeperClusterTestCase {
 
 
     @Test
-    public void fenceLedgerTest(){
+    public void test1(){
 
         Bookie bk = bs.get(0).getBookie();
         int result = 0;
@@ -67,13 +71,32 @@ public class FenceLedgerTest extends BookKeeperClusterTestCase {
         } catch (IOException | BookieException e) {
             e.printStackTrace();
             result = 1;
+
         }
 
-        try {
-            ledger.addEntry("bla bla bla".getBytes());
-        } catch (InterruptedException | BKException e) {
-            e.printStackTrace();
-            result = 2;
+        if(result == 0){
+
+            try {
+
+                ByteBuf buf = Unpooled.buffer();
+                buf.writeLong(ledgerId);
+                buf.writeBytes("bla bla bla".getBytes());
+
+                BookkeeperInternalCallbacks.WriteCallback wc = new BookkeeperInternalCallbacks.WriteCallback() {
+                    @Override
+                    public void writeComplete(int rc, long ledgerId, long entryId, BookieSocketAddress addr, Object ctx) {
+
+                    }
+                };
+
+                bk.addEntry(buf,false,wc,null,ledgerKey);
+
+            } catch (InterruptedException | BookieException | IOException e) {
+                e.printStackTrace();
+                result = 2;
+            }
+
+
         }
 
         Assert.assertEquals(expected,result);
