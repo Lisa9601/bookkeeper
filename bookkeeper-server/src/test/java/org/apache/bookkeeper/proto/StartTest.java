@@ -33,15 +33,15 @@ public class StartTest {
 
         ServerConfiguration conf1 = new ServerConfiguration();
         conf1.setAdvertisedAddress("127.0.0.1");
-        conf1.setBookiePort(2181);
+        conf1.setBookiePort(5000);
 
         ServerConfiguration conf2 = new ServerConfiguration();
         conf2.setAdvertisedAddress("127.0.0.1");
-        conf2.setBookiePort(2182);
+        conf2.setBookiePort(5001);
 
         ServerConfiguration conf3 = new ServerConfiguration();
         conf3.setAdvertisedAddress("127.0.0.1");
-        conf3.setBookiePort(2183);
+        conf3.setBookiePort(5002);
 
 
         BookieServer server1 = null;
