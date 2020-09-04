@@ -28,10 +28,20 @@ public class GetBookieAddressTest {
         ServerConfiguration advertisedConf = new ServerConfiguration();
         advertisedConf.setAdvertisedAddress("127.0.0.1");
 
+        ServerConfiguration advEmptyConf = new ServerConfiguration();
+        advEmptyConf.setAdvertisedAddress("");
+
         ServerConfiguration validConf = new ServerConfiguration();
         validConf.setListeningInterface("lo");
         validConf.setBookiePort(2181);
         validConf.setAllowLoopback(true);
+
+        ServerConfiguration shortHostConf = new ServerConfiguration();
+        shortHostConf.setListeningInterface("lo");
+        shortHostConf.setBookiePort(2181);
+        shortHostConf.setAllowLoopback(false);
+        shortHostConf.setUseHostNameAsBookieID(true);
+        shortHostConf.setUseShortHostName(true);
 
         try {
             BookieServer server = new BookieServer(validConf);
@@ -42,7 +52,9 @@ public class GetBookieAddressTest {
 
         return Arrays.asList(new Object[][] {
                 { advertisedConf, true },
+                { advEmptyConf, false },
                 { validConf, true },
+                { shortHostConf, false },
                 { new ServerConfiguration(), false },
                 { null, false }
         });

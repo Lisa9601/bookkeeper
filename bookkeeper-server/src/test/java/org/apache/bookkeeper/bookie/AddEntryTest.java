@@ -20,9 +20,9 @@ import java.util.Collection;
 public class AddEntryTest extends BookKeeperClusterTestCase {
 
     private long ledgerId;
-    private final long entryId = 20;
-    private static final String string = "text for tests";
+    private final long entryId = 2147483649L;
 
+    private static final String string = "text for tests";
     private static final byte[] masterKey = "password".getBytes();
     private static final BookkeeperInternalCallbacks.WriteCallback wc = (rc, ledgerId, entryId, addr, ctx) -> { };
 
@@ -31,7 +31,7 @@ public class AddEntryTest extends BookKeeperClusterTestCase {
     private BookkeeperInternalCallbacks.WriteCallback writeCallback;
     private Object ctx;
     private byte[] key;
-    private boolean valid;
+    private boolean isValid;
     private boolean expected;
 
     @Parameterized.Parameters
@@ -39,7 +39,7 @@ public class AddEntryTest extends BookKeeperClusterTestCase {
 
         return Arrays.asList(new Object[][] {
                 { Unpooled.buffer(), false, wc, null, masterKey, true, true },
-                { Unpooled.buffer(), true, wc, null, null, false, false },
+                { Unpooled.buffer(), true, wc, "context", null, false, false },
                 { null, false, null, null, masterKey, false, false }
         });
     }
@@ -53,7 +53,7 @@ public class AddEntryTest extends BookKeeperClusterTestCase {
         this.writeCallback = writeCallback;
         this.ctx = ctx;
         this.key = key;
-        this.valid = valid;
+        this.isValid = valid;
         this.expected = expected;
     }
 
@@ -65,7 +65,7 @@ public class AddEntryTest extends BookKeeperClusterTestCase {
         LedgerHandle ledger = bkc.createLedger(BookKeeper.DigestType.CRC32, masterKey);
         ledgerId = ledger.getId();
 
-        if(valid){
+        if(isValid){
             entry.writeLong(ledgerId);
             entry.writeLong(entryId);
             entry.writeBytes(string.getBytes());
@@ -88,7 +88,7 @@ public class AddEntryTest extends BookKeeperClusterTestCase {
             result = false;
         }
 
-        if(valid){
+        if(isValid){
 
             try {
                 ByteBuf entryRead = bookie.readEntry(ledgerId,entryId);

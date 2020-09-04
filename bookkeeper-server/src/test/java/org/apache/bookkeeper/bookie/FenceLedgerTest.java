@@ -20,14 +20,13 @@ import java.util.Collection;
 @RunWith(Parameterized.class)
 public class FenceLedgerTest extends BookKeeperClusterTestCase {
 
-    private LedgerHandle ledger = null;
-    private long entryId = 0;
-    private long ledgerId;
-    private byte[] ledgerKey;
-    private int expected;
     private static final byte[] masterKey = "password".getBytes();
 
-    public FenceLedgerTest(long ledgerId, byte[] ledgerKey, int expected) {
+    private long ledgerId;
+    private byte[] ledgerKey;
+    private boolean expected;
+
+    public FenceLedgerTest(long ledgerId, byte[] ledgerKey, boolean expected) {
         super(3);
         this.ledgerId = ledgerId;
         this.ledgerKey = ledgerKey;
@@ -39,9 +38,9 @@ public class FenceLedgerTest extends BookKeeperClusterTestCase {
     public static Collection params() {
 
         return Arrays.asList(new Object[][] {
-                { -1, null, 1 },
-                { 0, masterKey, 2 },
-                { 0, null, 1 }
+                { -1, null, false },
+                { 0, masterKey, true },
+                { 0, null, false }
         });
     }
 
@@ -51,7 +50,7 @@ public class FenceLedgerTest extends BookKeeperClusterTestCase {
     public void setUp() throws Exception {
         super.setUp();
 
-        ledger = bkc.createLedger(BookKeeper.DigestType.CRC32, masterKey);
+        LedgerHandle ledger = bkc.createLedger(BookKeeper.DigestType.CRC32, masterKey);
 
         if(ledgerId == 0) {
             ledgerId = ledger.getId();
@@ -61,20 +60,22 @@ public class FenceLedgerTest extends BookKeeperClusterTestCase {
 
 
     @Test
-    public void test1(){
+    public void test(){
 
         Bookie bk = bs.get(0).getBookie();
-        int result = 0;
+        boolean result = true;
 
         try {
             bk.fenceLedger(ledgerId, ledgerKey);
         } catch (IOException | BookieException e) {
             e.printStackTrace();
-            result = 1;
+            result = false;
 
         }
 
-        if(result == 0){
+        if(result){
+
+            result = false;
 
             try {
 
@@ -93,7 +94,7 @@ public class FenceLedgerTest extends BookKeeperClusterTestCase {
 
             } catch (InterruptedException | BookieException | IOException e) {
                 e.printStackTrace();
-                result = 2;
+                result = true;
             }
 
 
