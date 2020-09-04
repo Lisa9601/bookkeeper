@@ -3,6 +3,7 @@ package org.apache.bookkeeper.proto;
 
 import org.apache.bookkeeper.bookie.Bookie;
 import org.apache.bookkeeper.bookie.BookieException;
+import org.apache.bookkeeper.bookie.ExitCode;
 import org.apache.bookkeeper.conf.ServerConfiguration;
 import org.apache.bookkeeper.replication.ReplicationException;
 import org.apache.bookkeeper.test.BookKeeperClusterTestCase;
@@ -29,6 +30,7 @@ public class BookieServerTest extends BookKeeperClusterTestCase {
         server.shutdown();
 
         Assert.assertFalse(server.isRunning());
+        Assert.assertEquals(server.getExitCode(), ExitCode.OK);
 
     }
 
