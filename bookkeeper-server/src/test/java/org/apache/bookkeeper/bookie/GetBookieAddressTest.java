@@ -35,6 +35,8 @@ public class GetBookieAddressTest {
         validConf.setListeningInterface("lo");
         validConf.setBookiePort(2181);
         validConf.setAllowLoopback(true);
+        validConf.setUseHostNameAsBookieID(true);
+        validConf.setUseShortHostName(false);
 
         ServerConfiguration shortHostConf = new ServerConfiguration();
         shortHostConf.setListeningInterface("lo");

@@ -6,4 +6,4 @@
 
 #ISW2 project - Bookkeeper
 
-This is a cloned repository of the Apache BookKeeper project used to learn about software testing.
+This is a cloned repository of the Apache BookKeeper for learning purposes.

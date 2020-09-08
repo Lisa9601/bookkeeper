@@ -6,8 +6,7 @@ import org.apache.bookkeeper.conf.ServerConfiguration;
 import org.apache.bookkeeper.replication.ReplicationException;
 import org.apache.bookkeeper.tls.SecurityException;
 import org.apache.zookeeper.KeeperException;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.mockito.Mockito;
@@ -23,10 +22,23 @@ public class StartTest {
     private BookieServer server;
     private boolean expected;
 
+    private static BookieServer server1, server2, server3;
+
     public StartTest(BookieServer server, boolean expected) {
         this.server = server;
         this.expected = expected;
     }
+
+
+    @AfterClass
+    public static void tearDown() throws Exception {
+
+        server1.shutdown();
+        server2.shutdown();
+        server3.shutdown();
+
+    }
+
 
     @Parameterized.Parameters
     public static Collection params() {
@@ -43,12 +55,7 @@ public class StartTest {
         conf3.setAdvertisedAddress("127.0.0.1");
         conf3.setBookiePort(5002);
 
-
-        BookieServer server1 = null;
-        BookieServer server2 = null;
-        BookieServer server3 = null;
-
-        try {
+        try{
             server1 = new BookieServer(conf1);
 
             server2 = new BookieServer(conf2);
@@ -59,7 +66,7 @@ public class StartTest {
             server3 = new BookieServer(conf3);
             server3.setExceptionHandler((thread, throwable) -> { });
 
-        } catch (IOException | KeeperException | InterruptedException | BookieException | ReplicationException.UnavailableException | ReplicationException.CompatibilityException | SecurityException e) {
+        } catch (ReplicationException.CompatibilityException | ReplicationException.UnavailableException | KeeperException | BookieException | IOException | SecurityException | InterruptedException e) {
             e.printStackTrace();
         }
 

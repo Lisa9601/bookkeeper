@@ -2,6 +2,7 @@ package org.apache.bookkeeper.bookie;
 
 import org.junit.*;
 import org.mockito.Mockito;
+import org.mockito.internal.matchers.Null;
 
 import java.io.File;
 import java.io.IOException;
@@ -33,6 +34,25 @@ public class CheckDirectoryStructureTest {
         if(!dir1.delete() || !dir2.delete() || !dir3.delete()){
             throw new IOException("Failed to delete directory");
         }
+    }
+
+
+    //La directory è null
+    @Test
+    public void test0() {
+
+        boolean result = true;
+
+        File dir = null;
+        try {
+            Bookie.checkDirectoryStructure(dir);
+        } catch (IOException | NullPointerException e) {
+            e.printStackTrace();
+            result = false;
+        }
+
+        Assert.assertFalse(result);
+
     }
 
 
